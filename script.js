@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const canvas = new fabric.Canvas('canvas');
+    const canvas1 = new fabric.Canvas('canvas1');
+    const canvas2 = new fabric.Canvas('canvas2');
     const upload = document.getElementById('upload');
     const saveButton = document.getElementById('save');
     let baseImage = null;
@@ -16,18 +17,31 @@ document.addEventListener('DOMContentLoaded', function() {
             imgElement.src = f.target.result;
             
             imgElement.onload = function() {
-                const imgInstance = new fabric.Image(imgElement, {
+                const imgInstance1 = new fabric.Image(imgElement, {
                     left: 0,
                     top: 0,
                     selectable: false
                 });
-                canvas.clear();
-                canvas.setWidth(imgElement.width);
-                canvas.setHeight(imgElement.height);
-                canvas.add(imgInstance);
-                baseImage = imgInstance;
 
-                // Add BBB Arms 1 as an overlay
+                const imgInstance2 = new fabric.Image(imgElement, {
+                    left: 0,
+                    top: 0,
+                    selectable: false
+                });
+
+                canvas1.clear();
+                canvas1.setWidth(imgElement.width);
+                canvas1.setHeight(imgElement.height);
+                canvas1.add(imgInstance1);
+
+                canvas2.clear();
+                canvas2.setWidth(imgElement.width);
+                canvas2.setHeight(imgElement.height);
+                canvas2.add(imgInstance2);
+
+                baseImage = imgInstance1;
+
+                // Add BBB Arms 1 as an overlay on canvas1
                 fabric.Image.fromURL('images/muscular-arm1.png', function(img) {
                     img.scale(0.5);
                     img.set({
@@ -36,11 +50,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         selectable: false,
                         opacity: 0  // Initially hidden
                     });
-                    canvas.add(img);
+                    canvas1.add(img);
                     arm1 = img;
                 });
 
-                // Add BBB Arms 2 as an overlay
+                // Add BBB Arms 2 as an overlay on canvas2
                 fabric.Image.fromURL('images/muscular-arm2.png', function(img) {
                     img.scale(0.5);
                     img.set({
@@ -49,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         selectable: false,
                         opacity: 0  // Initially hidden
                     });
-                    canvas.add(img);
+                    canvas2.add(img);
                     arm2 = img;
                 });
             }
@@ -58,25 +72,26 @@ document.addEventListener('DOMContentLoaded', function() {
         reader.readAsDataURL(file);
     });
 
-    // Function to toggle arm image visibility
-    function toggleArm(armId) {
-        if (armId === 'arm1') {
-            arm1.opacity = (arm1.opacity === 0 ? 1 : 0);  // Toggle opacity
-        } else if (armId === 'arm2') {
-            arm2.opacity = (arm2.opacity === 0 ? 1 : 0);  // Toggle opacity
-        }
-        canvas.renderAll();  // Render canvas to apply changes
-    }
-
     // Function to save the meme
     saveButton.addEventListener('click', function() {
-        const dataURL = canvas.toDataURL({
+        const dataURL1 = canvas1.toDataURL({
             format: 'png',
             quality: 1
         });
-        const link = document.createElement('a');
-        link.href = dataURL;
-        link.download = 'meme.png';
-        link.click();
+
+        const dataURL2 = canvas2.toDataURL({
+            format: 'png',
+            quality: 1
+        });
+
+        const link1 = document.createElement('a');
+        link1.href = dataURL1;
+        link1.download = 'meme1.png';
+        link1.click();
+
+        const link2 = document.createElement('a');
+        link2.href = dataURL2;
+        link2.download = 'meme2.png';
+        link2.click();
     });
 });
