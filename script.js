@@ -1,10 +1,9 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const canvas1 = new fabric.Canvas('canvas1');
-    const canvas2 = new fabric.Canvas('canvas2');
+    const canvas = new fabric.Canvas('canvas');
     const upload = document.getElementById('upload');
     const saveButton = document.getElementById('save');
+    let baseImage = null;
     let arm1 = null;
-    let arm2 = null;
 
     // Function to handle image upload
     upload.addEventListener('change', function(event) {
@@ -30,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 const scale = Math.min(scaleX, scaleY);
 
-                const imgInstance1 = new fabric.Image(imgElement, {
+                const imgInstance = new fabric.Image(imgElement, {
                     left: 0,
                     top: 0,
                     scaleX: scale,
@@ -38,25 +37,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     selectable: false
                 });
 
-                const imgInstance2 = new fabric.Image(imgElement, {
-                    left: 0,
-                    top: 0,
-                    scaleX: scale,
-                    scaleY: scale,
-                    selectable: false
-                });
+                canvas.clear();
+                canvas.setWidth(imgInstance.width * scale);
+                canvas.setHeight(imgInstance.height * scale);
+                canvas.add(imgInstance);
+                baseImage = imgInstance;
 
-                canvas1.clear();
-                canvas1.setWidth(imgInstance1.width * scale);
-                canvas1.setHeight(imgInstance1.height * scale);
-                canvas1.add(imgInstance1);
-
-                canvas2.clear();
-                canvas2.setWidth(imgInstance2.width * scale);
-                canvas2.setHeight(imgInstance2.height * scale);
-                canvas2.add(imgInstance2);
-
-                // Add BBB Arms 1 as an overlay on both canvases
+                // Add BBB Arms 1 as an overlay
                 fabric.Image.fromURL('images/muscular-arm1.png', function(img) {
                     img.scale(0.5 * scale);
                     img.set({
@@ -65,23 +52,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         selectable: true, // Allow selection
                         opacity: 1  // Ensure opacity is 1
                     });
-                    canvas1.add(img);
-                    canvas2.add(img.clone()); // Clone for canvas2
+                    canvas.add(img);
                     arm1 = img;
-                });
-
-                // Add BBB Arms 2 as an overlay on both canvases
-                fabric.Image.fromURL('images/muscular-arm2.png', function(img) {
-                    img.scale(0.5 * scale);
-                    img.set({
-                        left: 200 * scale,
-                        top: 100 * scale,
-                        selectable: true, // Allow selection
-                        opacity: 1  // Ensure opacity is 1
-                    });
-                    canvas1.add(img);
-                    canvas2.add(img.clone()); // Clone for canvas2
-                    arm2 = img;
                 });
             }
         }
@@ -91,73 +63,58 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to save the meme
     saveButton.addEventListener('click', function() {
-        const dataURL1 = canvas1.toDataURL({
+        const dataURL = canvas.toDataURL({
             format: 'png',
             quality: 1
         });
 
-        const dataURL2 = canvas2.toDataURL({
-            format: 'png',
-            quality: 1
-        });
-
-        const link1 = document.createElement('a');
-        link1.href = dataURL1;
-        link1.download = 'meme1.png';
-        link1.click();
-
-        const link2 = document.createElement('a');
-        link2.href = dataURL2;
-        link2.download = 'meme2.png';
-        link2.click();
+        const link = document.createElement('a');
+        link.href = dataURL;
+        link.download = 'meme.png';
+        link.click();
     });
 
-    // Enable selection and manipulation of arms on both canvases
-    [canvas1, canvas2].forEach(canvas => {
-        canvas.on('object:selected', function(e) {
-            e.target.set({
+    // Event listener to allow manipulation of arm
+    canvas.on('object:selected', function(e) {
+        const obj = e.target;
+        if (obj === arm1) {
+            obj.set({
                 borderColor: '#FF0000', // Optional: Highlight selected arm
                 cornerColor: '#FF0000', // Optional: Highlight selected arm
                 cornerStrokeColor: '#FF0000' // Optional: Highlight selected arm
             });
-        });
-
-        canvas.on('selection:cleared', function(e) {
-            if (e.target === canvas1 && arm1) {
-                arm1.set({
-                    borderColor: 'transparent', // Reset border color
-                    cornerColor: 'transparent', // Reset corner color
-                    cornerStrokeColor: 'transparent' // Reset corner stroke color
-                });
-            } else if (e.target === canvas2 && arm2) {
-                arm2.set({
-                    borderColor: 'transparent', // Reset border color
-                    cornerColor: 'transparent', // Reset corner color
-                    cornerStrokeColor: 'transparent' // Reset corner stroke color
-                });
-            }
-        });
-
-        canvas.on('object:scaling', function(e) {
-            const obj = e.target;
-            obj.setCoords(); // Update object's coordinates
-
-            // Limit scaling to avoid arms going out of image bounds
-            if (obj.scaleX > obj.maxScaleFactor) {
-                obj.scaleX = obj.maxScaleFactor;
-            }
-            if (obj.scaleY > obj.maxScaleFactor) {
-                obj.scaleY = obj.maxScaleFactor;
-            }
-        });
-
-        canvas.on('selection:updated', function(e) {
-            const obj = e.target;
-            if (obj === arm1) {
-                arm1 = obj; // Update arm1 reference
-            } else if (obj === arm2) {
-                arm2 = obj; // Update arm2 reference
-            }
-        });
+        }
     });
+
+    canvas.on('selection:cleared', function(e) {
+        const obj = e.target;
+        if (obj === arm1) {
+            arm1.set({
+                borderColor: 'transparent', // Reset border color
+                cornerColor: 'transparent', // Reset corner color
+                cornerStrokeColor: 'transparent' // Reset corner stroke color
+            });
+        }
+    });
+
+    canvas.on('object:scaling', function(e) {
+        const obj = e.target;
+        obj.setCoords(); // Update object's coordinates
+
+        // Limit scaling to avoid arms going out of image bounds
+        if (obj.scaleX > obj.maxScaleFactor) {
+            obj.scaleX = obj.maxScaleFactor;
+        }
+        if (obj.scaleY > obj.maxScaleFactor) {
+            obj.scaleY = obj.maxScaleFactor;
+        }
+    });
+
+    canvas.on('selection:updated', function(e) {
+        const obj = e.target;
+        if (obj === arm1) {
+            arm1 = obj; // Update arm1 reference
+        }
+    });
+
 });
