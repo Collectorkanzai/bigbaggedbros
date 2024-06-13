@@ -16,34 +16,52 @@ document.addEventListener('DOMContentLoaded', function() {
             imgElement.src = f.target.result;
             
             imgElement.onload = function() {
+                const maxImageWidth = 400; // Adjust this value as needed
+                const maxImageHeight = 400; // Adjust this value as needed
+
+                // Calculate scaled dimensions to fit within canvas
+                let scaleX = 1;
+                let scaleY = 1;
+                if (imgElement.width > maxImageWidth) {
+                    scaleX = maxImageWidth / imgElement.width;
+                }
+                if (imgElement.height > maxImageHeight) {
+                    scaleY = maxImageHeight / imgElement.height;
+                }
+                const scale = Math.min(scaleX, scaleY);
+
                 const imgInstance1 = new fabric.Image(imgElement, {
                     left: 0,
                     top: 0,
+                    scaleX: scale,
+                    scaleY: scale,
                     selectable: false
                 });
 
                 const imgInstance2 = new fabric.Image(imgElement, {
                     left: 0,
                     top: 0,
+                    scaleX: scale,
+                    scaleY: scale,
                     selectable: false
                 });
 
                 canvas1.clear();
-                canvas1.setWidth(imgElement.width);
-                canvas1.setHeight(imgElement.height);
+                canvas1.setWidth(imgInstance1.width * scale);
+                canvas1.setHeight(imgInstance1.height * scale);
                 canvas1.add(imgInstance1);
 
                 canvas2.clear();
-                canvas2.setWidth(imgElement.width);
-                canvas2.setHeight(imgElement.height);
+                canvas2.setWidth(imgInstance2.width * scale);
+                canvas2.setHeight(imgInstance2.height * scale);
                 canvas2.add(imgInstance2);
 
                 // Add BBB Arms 1 as an overlay on canvas1
                 fabric.Image.fromURL('images/muscular-arm1.png', function(img) {
-                    img.scale(0.5);
+                    img.scale(0.5 * scale);
                     img.set({
-                        left: 100,
-                        top: 100,
+                        left: 100 * scale,
+                        top: 100 * scale,
                         selectable: false,
                         opacity: 1  // Ensure opacity is 1
                     });
@@ -53,10 +71,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Add BBB Arms 2 as an overlay on canvas2
                 fabric.Image.fromURL('images/muscular-arm2.png', function(img) {
-                    img.scale(0.5);
+                    img.scale(0.5 * scale);
                     img.set({
-                        left: 200,
-                        top: 100,
+                        left: 200 * scale,
+                        top: 100 * scale,
                         selectable: false,
                         opacity: 1  // Ensure opacity is 1
                     });
@@ -92,3 +110,4 @@ document.addEventListener('DOMContentLoaded', function() {
         link2.click();
     });
 });
+
