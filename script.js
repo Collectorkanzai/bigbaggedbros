@@ -109,4 +109,80 @@ document.addEventListener('DOMContentLoaded', function() {
         link2.download = 'meme2.png';
         link2.click();
     });
+
+    // Enable selection and manipulation of arms
+    canvas1.on('object:selected', function(e) {
+        e.target.set({
+            borderColor: '#FF0000', // Optional: Highlight selected arm
+            cornerColor: '#FF0000', // Optional: Highlight selected arm
+            cornerStrokeColor: '#FF0000' // Optional: Highlight selected arm
+        });
+    });
+
+    canvas2.on('object:selected', function(e) {
+        e.target.set({
+            borderColor: '#FF0000', // Optional: Highlight selected arm
+            cornerColor: '#FF0000', // Optional: Highlight selected arm
+            cornerStrokeColor: '#FF0000' // Optional: Highlight selected arm
+        });
+    });
+
+    // Deselect arms when clicking outside the canvas
+    canvas1.on('selection:cleared', function(e) {
+        if (arm1) {
+            arm1.set({
+                borderColor: 'transparent', // Reset border color
+                cornerColor: 'transparent', // Reset corner color
+                cornerStrokeColor: 'transparent' // Reset corner stroke color
+            });
+        }
+    });
+
+    canvas2.on('selection:cleared', function(e) {
+        if (arm2) {
+            arm2.set({
+                borderColor: 'transparent', // Reset border color
+                cornerColor: 'transparent', // Reset corner color
+                cornerStrokeColor: 'transparent' // Reset corner stroke color
+            });
+        }
+    });
+
+    // Handle resizing of arms
+    canvas1.on('object:scaling', function(e) {
+        const obj = e.target;
+        obj.setCoords(); // Update object's coordinates
+
+        // Limit scaling to avoid arms going out of image bounds
+        if (obj.scaleX > obj.maxScaleFactor) {
+            obj.scaleX = obj.maxScaleFactor;
+        }
+        if (obj.scaleY > obj.maxScaleFactor) {
+            obj.scaleY = obj.maxScaleFactor;
+        }
+    });
+
+    canvas2.on('object:scaling', function(e) {
+        const obj = e.target;
+        obj.setCoords(); // Update object's coordinates
+
+        // Limit scaling to avoid arms going out of image bounds
+        if (obj.scaleX > obj.maxScaleFactor) {
+            obj.scaleX = obj.maxScaleFactor;
+        }
+        if (obj.scaleY > obj.maxScaleFactor) {
+            obj.scaleY = obj.maxScaleFactor;
+        }
+    });
+
+    // Update arm properties when selection is modified
+    canvas1.on('selection:updated', function(e) {
+        const obj = e.target;
+        arm1 = obj; // Update arm1 reference
+    });
+
+    canvas2.on('selection:updated', function(e) {
+        const obj = e.target;
+        arm2 = obj; // Update arm2 reference
+    });
 });
