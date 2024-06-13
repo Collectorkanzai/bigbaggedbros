@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     img.set({
                         left: 100 * scale,
                         top: 100 * scale,
-                        selectable: false,
+                        selectable: true, // Allow selection
                         opacity: 1  // Ensure opacity is 1
                     });
                     canvas1.add(img);
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     img.set({
                         left: 200 * scale,
                         top: 100 * scale,
-                        selectable: false,
+                        selectable: true, // Allow selection
                         opacity: 1  // Ensure opacity is 1
                     });
                     canvas2.add(img);
@@ -110,4 +110,3 @@ document.addEventListener('DOMContentLoaded', function() {
         link2.click();
     });
 });
-
