@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         left: 100,
                         top: 100,
                         selectable: false,
-                        opacity: 0  // Initially hidden
+                        opacity: 1  // Ensure opacity is 1
                     });
                     canvas1.add(img);
                     arm1 = img;
@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         left: 200,
                         top: 100,
                         selectable: false,
-                        opacity: 0  // Initially hidden
+                        opacity: 1  // Ensure opacity is 1
                     });
                     canvas2.add(img);
                     arm2 = img;
