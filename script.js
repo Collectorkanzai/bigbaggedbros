@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const canvas2 = new fabric.Canvas('canvas2');
     const upload = document.getElementById('upload');
     const saveButton = document.getElementById('save');
-    let baseImage = null;
     let arm1 = null;
     let arm2 = null;
 
@@ -38,8 +37,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 canvas2.setWidth(imgElement.width);
                 canvas2.setHeight(imgElement.height);
                 canvas2.add(imgInstance2);
-
-                baseImage = imgInstance1;
 
                 // Add BBB Arms 1 as an overlay on canvas1
                 fabric.Image.fromURL('images/muscular-arm1.png', function(img) {
