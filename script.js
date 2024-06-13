@@ -15,40 +15,29 @@ document.addEventListener('DOMContentLoaded', function() {
             imgElement.src = f.target.result;
             
             imgElement.onload = function() {
-                const maxImageWidth = 400; // Adjust this value as needed
-                const maxImageHeight = 400; // Adjust this value as needed
-
-                // Calculate scaled dimensions to fit within canvas
-                let scaleX = 1;
-                let scaleY = 1;
-                if (imgElement.width > maxImageWidth) {
-                    scaleX = maxImageWidth / imgElement.width;
-                }
-                if (imgElement.height > maxImageHeight) {
-                    scaleY = maxImageHeight / imgElement.height;
-                }
-                const scale = Math.min(scaleX, scaleY);
+                const scaledWidth = imgElement.width * 2; // Double width
+                const scaledHeight = imgElement.height * 1.5; // 50% higher
 
                 const imgInstance = new fabric.Image(imgElement, {
                     left: 0,
                     top: 0,
-                    scaleX: scale,
-                    scaleY: scale,
+                    scaleX: scaledWidth / imgElement.width,
+                    scaleY: scaledHeight / imgElement.height,
                     selectable: false
                 });
 
                 canvas.clear();
-                canvas.setWidth(imgInstance.width * scale);
-                canvas.setHeight(imgInstance.height * scale);
+                canvas.setWidth(scaledWidth);
+                canvas.setHeight(scaledHeight);
                 canvas.add(imgInstance);
                 baseImage = imgInstance;
 
                 // Add BBB Arms 1 as an overlay
                 fabric.Image.fromURL('images/muscular-arm1.png', function(img) {
-                    img.scale(0.5 * scale);
+                    img.scale(0.5 * imgInstance.scaleX); // Scale arm relative to image size
                     img.set({
-                        left: 100 * scale,
-                        top: 100 * scale,
+                        left: 100 * imgInstance.scaleX,
+                        top: 100 * imgInstance.scaleY,
                         selectable: true, // Allow selection
                         opacity: 1  // Ensure opacity is 1
                     });
