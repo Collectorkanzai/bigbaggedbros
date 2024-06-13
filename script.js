@@ -63,15 +63,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to save the meme
     saveButton.addEventListener('click', function() {
+        canvas.discardActiveObject(); // Deselect any active objects
+        
+        // Generate image URL from canvas
         const dataURL = canvas.toDataURL({
             format: 'png',
             quality: 1
         });
 
+        // Create a temporary link element
         const link = document.createElement('a');
         link.href = dataURL;
-        link.download = 'meme.png';
-        link.click();
+        link.download = 'meme.png'; // Set the download attribute
+        document.body.appendChild(link); // Append the link to the body
+        link.click(); // Programmatically click the link to trigger download
+        document.body.removeChild(link); // Clean up: remove the link from the body
     });
 
     // Event listener to allow manipulation of arm
