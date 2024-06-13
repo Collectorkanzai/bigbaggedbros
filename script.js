@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 canvas2.setHeight(imgInstance2.height * scale);
                 canvas2.add(imgInstance2);
 
-                // Add BBB Arms 1 as an overlay on canvas1
+                // Add BBB Arms 1 as an overlay on both canvases
                 fabric.Image.fromURL('images/muscular-arm1.png', function(img) {
                     img.scale(0.5 * scale);
                     img.set({
@@ -66,10 +66,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         opacity: 1  // Ensure opacity is 1
                     });
                     canvas1.add(img);
+                    canvas2.add(img.clone()); // Clone for canvas2
                     arm1 = img;
                 });
 
-                // Add BBB Arms 2 as an overlay on canvas2
+                // Add BBB Arms 2 as an overlay on both canvases
                 fabric.Image.fromURL('images/muscular-arm2.png', function(img) {
                     img.scale(0.5 * scale);
                     img.set({
@@ -78,7 +79,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         selectable: true, // Allow selection
                         opacity: 1  // Ensure opacity is 1
                     });
-                    canvas2.add(img);
+                    canvas1.add(img);
+                    canvas2.add(img.clone()); // Clone for canvas2
                     arm2 = img;
                 });
             }
@@ -110,79 +112,52 @@ document.addEventListener('DOMContentLoaded', function() {
         link2.click();
     });
 
-    // Enable selection and manipulation of arms
-    canvas1.on('object:selected', function(e) {
-        e.target.set({
-            borderColor: '#FF0000', // Optional: Highlight selected arm
-            cornerColor: '#FF0000', // Optional: Highlight selected arm
-            cornerStrokeColor: '#FF0000' // Optional: Highlight selected arm
-        });
-    });
-
-    canvas2.on('object:selected', function(e) {
-        e.target.set({
-            borderColor: '#FF0000', // Optional: Highlight selected arm
-            cornerColor: '#FF0000', // Optional: Highlight selected arm
-            cornerStrokeColor: '#FF0000' // Optional: Highlight selected arm
-        });
-    });
-
-    // Deselect arms when clicking outside the canvas
-    canvas1.on('selection:cleared', function(e) {
-        if (arm1) {
-            arm1.set({
-                borderColor: 'transparent', // Reset border color
-                cornerColor: 'transparent', // Reset corner color
-                cornerStrokeColor: 'transparent' // Reset corner stroke color
+    // Enable selection and manipulation of arms on both canvases
+    [canvas1, canvas2].forEach(canvas => {
+        canvas.on('object:selected', function(e) {
+            e.target.set({
+                borderColor: '#FF0000', // Optional: Highlight selected arm
+                cornerColor: '#FF0000', // Optional: Highlight selected arm
+                cornerStrokeColor: '#FF0000' // Optional: Highlight selected arm
             });
-        }
-    });
+        });
 
-    canvas2.on('selection:cleared', function(e) {
-        if (arm2) {
-            arm2.set({
-                borderColor: 'transparent', // Reset border color
-                cornerColor: 'transparent', // Reset corner color
-                cornerStrokeColor: 'transparent' // Reset corner stroke color
-            });
-        }
-    });
+        canvas.on('selection:cleared', function(e) {
+            if (e.target === canvas1 && arm1) {
+                arm1.set({
+                    borderColor: 'transparent', // Reset border color
+                    cornerColor: 'transparent', // Reset corner color
+                    cornerStrokeColor: 'transparent' // Reset corner stroke color
+                });
+            } else if (e.target === canvas2 && arm2) {
+                arm2.set({
+                    borderColor: 'transparent', // Reset border color
+                    cornerColor: 'transparent', // Reset corner color
+                    cornerStrokeColor: 'transparent' // Reset corner stroke color
+                });
+            }
+        });
 
-    // Handle resizing of arms
-    canvas1.on('object:scaling', function(e) {
-        const obj = e.target;
-        obj.setCoords(); // Update object's coordinates
+        canvas.on('object:scaling', function(e) {
+            const obj = e.target;
+            obj.setCoords(); // Update object's coordinates
 
-        // Limit scaling to avoid arms going out of image bounds
-        if (obj.scaleX > obj.maxScaleFactor) {
-            obj.scaleX = obj.maxScaleFactor;
-        }
-        if (obj.scaleY > obj.maxScaleFactor) {
-            obj.scaleY = obj.maxScaleFactor;
-        }
-    });
+            // Limit scaling to avoid arms going out of image bounds
+            if (obj.scaleX > obj.maxScaleFactor) {
+                obj.scaleX = obj.maxScaleFactor;
+            }
+            if (obj.scaleY > obj.maxScaleFactor) {
+                obj.scaleY = obj.maxScaleFactor;
+            }
+        });
 
-    canvas2.on('object:scaling', function(e) {
-        const obj = e.target;
-        obj.setCoords(); // Update object's coordinates
-
-        // Limit scaling to avoid arms going out of image bounds
-        if (obj.scaleX > obj.maxScaleFactor) {
-            obj.scaleX = obj.maxScaleFactor;
-        }
-        if (obj.scaleY > obj.maxScaleFactor) {
-            obj.scaleY = obj.maxScaleFactor;
-        }
-    });
-
-    // Update arm properties when selection is modified
-    canvas1.on('selection:updated', function(e) {
-        const obj = e.target;
-        arm1 = obj; // Update arm1 reference
-    });
-
-    canvas2.on('selection:updated', function(e) {
-        const obj = e.target;
-        arm2 = obj; // Update arm2 reference
+        canvas.on('selection:updated', function(e) {
+            const obj = e.target;
+            if (obj === arm1) {
+                arm1 = obj; // Update arm1 reference
+            } else if (obj === arm2) {
+                arm2 = obj; // Update arm2 reference
+            }
+        });
     });
 });
